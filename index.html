@@ -28,9 +28,9 @@
 
         button {
             padding: 10px 20px;
-            font-size: 12px;
+            font-size: 16px;
             color: white;
-            background-color: lightgreen;
+            background-color: rgb(241, 82, 8);
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -62,6 +62,9 @@
         #feedback {
             font-weight: bold;
         }
+        .colore{
+            color: rgb(7, 69, 241)
+        }
     </style>
 </head>
 <body>
@@ -69,7 +72,7 @@
     
     <!-- Section to type a phrase and have it spoken aloud -->
     <div>
-        <h2>You need to set the Phrase first, once button is blue, you are all set to practice speaking!!</h2>
+        <h2 id="colore">You need to set the Phrase first, once button is blue, you are all set to practice speaking!!</h2>
         <h2>Type a Phrase to Practice</h2>
         <input type="text" id="userText" placeholder="Type a phrase">
         <button id="setTypedPhraseButton" onclick="setPhrase('typed')">Set this Phrase</button>
