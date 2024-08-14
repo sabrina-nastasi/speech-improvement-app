@@ -108,18 +108,31 @@
 
         // Function to read aloud the typed phrase
         function readAloud() {
-            if (currentPhrase === '') {
-                document.getElementById('feedback').innerText = "Please set a phrase first.";
-                return;
-            }
+    if (currentPhrase === '') {
+        document.getElementById('feedback').innerText = "Please set a phrase first.";
+        return;
+    }
 
-            const utterance = new SpeechSynthesisUtterance(currentPhrase);
-            utterance.lang = 'en-US';  // Ensures American English accent
-            utterance.rate = 1;  // Normal speed
-            utterance.pitch = 1;  // Normal pitch
+    const utterance = new SpeechSynthesisUtterance(currentPhrase);
+    utterance.lang = 'en-US';
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
-            window.speechSynthesis.speak(utterance);
-        }
+    utterance.onstart = function() {
+        console.log('Speech started');
+    };
+
+    utterance.onerror = function(event) {
+        console.error('Speech synthesis error:', event.error);
+        document.getElementById('feedback').innerText = "Failed to read aloud. Please try again.";
+    };
+
+    window.speechSynthesis.cancel();  // Clear any previous utterances
+    window.speechSynthesis.speak(utterance);
+
+    console.log('Speaking:', currentPhrase);
+}
+
 
         // Function to read aloud the random phrase from the internet
         function readRandomPhraseAloud() {
