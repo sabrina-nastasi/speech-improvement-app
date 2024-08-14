@@ -161,48 +161,54 @@
         }
 
         // Function to start listening and provide feedback on user's speech
-        function startListening() {
-            if (currentPhrase === '') {
-                document.getElementById('feedback').innerText = "Please set a phrase first.";
-                return;
-            }
+       // Function to start listening and provide feedback on user's speech
+function startListening() {
+    // Check if there's a phrase to practice
+    if (currentPhrase === '' && randomPhrase === '') {
+        document.getElementById('feedback').innerText = "Please set a phrase first.";
+        return;
+    }
 
-            const startButton = document.getElementById('startSpeakingButton');
-            startButton.classList.add('recording');  // Change button color to green
-            document.getElementById('feedback').innerText = "Listening...";
+    // Determine which phrase to use for practice
+    const phraseToPractice = currentPhrase !== '' ? currentPhrase : randomPhrase;
 
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';  // Ensures American English recognition
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+    const startButton = document.getElementById('startSpeakingButton');
+    startButton.classList.add('recording');  // Change button color to green
+    document.getElementById('feedback').innerText = "Listening...";
 
-            // Start listening and recording
-            recognition.start();
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US';  // Ensures American English recognition
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-            recognition.onresult = (event) => {
-                const spokenText = event.results[0][0].transcript;
-                document.getElementById('transcription').innerText = `You said: "${spokenText}"`;
+    // Start listening and recording
+    recognition.start();
 
-                const normalizedSpokenText = normalizeText(spokenText);
-                const normalizedPhrase = normalizeText(currentPhrase);
+    recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript;
+        document.getElementById('transcription').innerText = `You said: "${spokenText}"`;
 
-                if (normalizedSpokenText === normalizedPhrase) {
-                    document.getElementById('feedback').innerText = "Great job!";
-                } else {
-                    document.getElementById('feedback').innerText = "Try again!";
-                }
-            };
+        const normalizedSpokenText = normalizeText(spokenText);
+        const normalizedPhrase = normalizeText(phraseToPractice);
 
-            recognition.onerror = (event) => {
-                document.getElementById('feedback').innerText = "Error occurred in recognition: " + event.error;
-                startButton.classList.remove('recording');  // Change button color back to red
-            };
-
-            startButton.onmouseup = () => {
-                recognition.stop();
-                startButton.classList.remove('recording');  // Change button color back to red
-            };
+        if (normalizedSpokenText === normalizedPhrase) {
+            document.getElementById('feedback').innerText = "Great job!";
+        } else {
+            document.getElementById('feedback').innerText = "Try again!";
         }
+    };
+
+    recognition.onerror = (event) => {
+        document.getElementById('feedback').innerText = "Error occurred in recognition: " + event.error;
+        startButton.classList.remove('recording');  // Change button color back to red
+    };
+
+    startButton.onmouseup = () => {
+        recognition.stop();
+        startButton.classList.remove('recording');  // Change button color back to red
+    };
+}
+
 
         function normalizeText(text) {
             return text.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, "").trim();
