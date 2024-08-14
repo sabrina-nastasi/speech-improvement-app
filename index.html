@@ -65,14 +65,15 @@
     </style>
 </head>
 <body>
-    <h1>Speech Improvement Tool</h1>
+    <h1>Speech Practice</h1>
     
     <!-- Section to type a phrase and have it spoken aloud -->
     <div>
+        <h2>You need to set the Phrase first, once button is blue, you are all set to practice speaking!!</h2>
         <h2>Type a Phrase to Practice</h2>
         <input type="text" id="userText" placeholder="Type a phrase">
-        <button id="setTypedPhraseButton" onclick="setPhrase('typed')">Set Phrase</button>
-        <button onclick="readAloudTypedPhrase()">Read Aloud</button>
+        <button id="setTypedPhraseButton" onclick="setPhrase('typed')">Set this Phrase</button>
+        <button onclick="readAloudTypedPhrase()">Read this Phrase Aloud</button>
         <p id="setPhraseText"></p>
     </div>
     
@@ -89,8 +90,8 @@
     <div>
         <h2>Random Phrase from Internet</h2>
         <button onclick="fetchRandomPhrase()">Get Random Phrase</button>
-        <button id="setRandomPhraseButton" onclick="setPhrase('random')">Set Phrase</button>
-        <button onclick="readRandomPhraseAloud()">Read Aloud Random Phrase</button>
+        <button id="setRandomPhraseButton" onclick="setPhrase('random')">Set this Phrase</button>
+        <button onclick="readRandomPhraseAloud()">Press to Read</button>
         <p id="randomPhraseText"></p>
     </div>
 
