@@ -37,6 +37,10 @@
             margin-top: 10px;
         }
 
+        button.active {
+            background-color: blue;
+        }
+
         #startSpeakingButton.recording {
             background-color: green;
         }
@@ -67,7 +71,7 @@
     <div>
         <h2>Type a Phrase to Practice</h2>
         <input type="text" id="userText" placeholder="Type a phrase">
-        <button onclick="setPhrase()">Set Phrase</button>
+        <button id="setTypedPhraseButton" onclick="setPhrase('typed')">Set Phrase</button>
         <button onclick="readAloudTypedPhrase()">Read Aloud</button>
         <p id="setPhraseText"></p>
     </div>
@@ -85,6 +89,7 @@
     <div>
         <h2>Random Phrase from Internet</h2>
         <button onclick="fetchRandomPhrase()">Get Random Phrase</button>
+        <button id="setRandomPhraseButton" onclick="setPhrase('random')">Set Phrase</button>
         <button onclick="readRandomPhraseAloud()">Read Aloud Random Phrase</button>
         <p id="randomPhraseText"></p>
     </div>
@@ -93,15 +98,19 @@
         let currentPhrase = '';  // To store the phrase currently being practiced
         let randomPhrase = '';   // To store the fetched random phrase
 
-        // Function to set the user-typed phrase
-        function setPhrase() {
-            const text = document.getElementById('userText').value;
-            if (text.trim() === '') {
-                document.getElementById('feedback').innerText = "Please type a phrase.";
-                return;
+        // Function to set the active phrase (either typed or random)
+        function setPhrase(type) {
+            if (type === 'typed') {
+                currentPhrase = document.getElementById('userText').value;
+                document.getElementById('setPhraseText').innerText = `Practice this phrase: "${currentPhrase}"`;
+                document.getElementById('setTypedPhraseButton').classList.add('active');
+                document.getElementById('setRandomPhraseButton').classList.remove('active');
+            } else if (type === 'random') {
+                currentPhrase = randomPhrase;
+                document.getElementById('setPhraseText').innerText = `Practice this random phrase: "${currentPhrase}"`;
+                document.getElementById('setRandomPhraseButton').classList.add('active');
+                document.getElementById('setTypedPhraseButton').classList.remove('active');
             }
-            currentPhrase = text;  // Set the current phrase to the user-typed phrase
-            document.getElementById('setPhraseText').innerText = `Practice this phrase: "${currentPhrase}"`;
             document.getElementById('feedback').innerText = '';  // Clear previous feedback
             document.getElementById('transcription').innerText = '';  // Clear previous transcription
         }
@@ -161,54 +170,48 @@
         }
 
         // Function to start listening and provide feedback on user's speech
-       // Function to start listening and provide feedback on user's speech
-function startListening() {
-    // Check if there's a phrase to practice
-    if (currentPhrase === '' && randomPhrase === '') {
-        document.getElementById('feedback').innerText = "Please set a phrase first.";
-        return;
-    }
+        function startListening() {
+            if (currentPhrase === '') {
+                document.getElementById('feedback').innerText = "Please set a phrase first.";
+                return;
+            }
 
-    // Determine which phrase to use for practice
-    const phraseToPractice = currentPhrase !== '' ? currentPhrase : randomPhrase;
+            const startButton = document.getElementById('startSpeakingButton');
+            startButton.classList.add('recording');  // Change button color to green
+            document.getElementById('feedback').innerText = "Listening...";
 
-    const startButton = document.getElementById('startSpeakingButton');
-    startButton.classList.add('recording');  // Change button color to green
-    document.getElementById('feedback').innerText = "Listening...";
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';  // Ensures American English recognition
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
 
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'en-US';  // Ensures American English recognition
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+            // Start listening and recording
+            recognition.start();
 
-    // Start listening and recording
-    recognition.start();
+            recognition.onresult = (event) => {
+                const spokenText = event.results[0][0].transcript;
+                document.getElementById('transcription').innerText = `You said: "${spokenText}"`;
 
-    recognition.onresult = (event) => {
-        const spokenText = event.results[0][0].transcript;
-        document.getElementById('transcription').innerText = `You said: "${spokenText}"`;
+                const normalizedSpokenText = normalizeText(spokenText);
+                const normalizedPhrase = normalizeText(currentPhrase);
 
-        const normalizedSpokenText = normalizeText(spokenText);
-        const normalizedPhrase = normalizeText(phraseToPractice);
+                if (normalizedSpokenText === normalizedPhrase) {
+                    document.getElementById('feedback').innerText = "Great job!";
+                } else {
+                    document.getElementById('feedback').innerText = "Try again!";
+                }
+            };
 
-        if (normalizedSpokenText === normalizedPhrase) {
-            document.getElementById('feedback').innerText = "Great job!";
-        } else {
-            document.getElementById('feedback').innerText = "Try again!";
+            recognition.onerror = (event) => {
+                document.getElementById('feedback').innerText = "Error occurred in recognition: " + event.error;
+                startButton.classList.remove('recording');  // Change button color back to red
+            };
+
+            startButton.onmouseup = () => {
+                recognition.stop();
+                startButton.classList.remove('recording');  // Change button color back to red
+            };
         }
-    };
-
-    recognition.onerror = (event) => {
-        document.getElementById('feedback').innerText = "Error occurred in recognition: " + event.error;
-        startButton.classList.remove('recording');  // Change button color back to red
-    };
-
-    startButton.onmouseup = () => {
-        recognition.stop();
-        startButton.classList.remove('recording');  // Change button color back to red
-    };
-}
-
 
         function normalizeText(text) {
             return text.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, "").trim();
