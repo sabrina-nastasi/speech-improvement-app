@@ -203,20 +203,18 @@ recognition.onresult = (event) => {
 
         // Function to fetch a random phrase from the internet
         function fetchRandomPhrase() {
-            fetch('http://localhost:5000/api/random-phrase')
-                .then(response => response.json())
-                .then(data => {
-                    randomPhrase = data.phrase;
-                    currentPhrase = randomPhrase;  // Set the current phrase to the random one for practicing
-                    document.getElementById('randomPhraseText').innerText = `Practice this random phrase: "${randomPhrase}"`;
-                    document.getElementById('feedback').innerText = '';  // Clear previous feedback
-                    document.getElementById('transcription').innerText = '';  // Clear previous transcription
-                })
-                .catch(error => {
-                    console.error('Error fetching the random phrase:', error);
-                    document.getElementById('randomPhraseText').innerText = "Failed to fetch random phrase.";
-                });
-        }
+    fetch('https://api.quotable.io/random')
+        .then(response => response.json())
+        .then(data => {
+            currentPhrase = data.content;
+            document.getElementById('randomPhraseText').innerText = `Practice this random phrase: "${currentPhrase}"`;
+        })
+        .catch(error => {
+            console.error('Error fetching the random phrase:', error);
+            document.getElementById('randomPhraseText').innerText = "Failed to fetch random phrase.";
+        });
+}
+
     </script>
 </body>
 </html>
